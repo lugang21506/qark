@@ -34,6 +34,7 @@ cffi==1.11.5 \
     --hash=sha256:ed01918d545a38998bfa5902c7c00e0fee90e957ce036a4000a88e3fe2264917 \
     --hash=sha256:edabd457cd23a02965166026fd9bfd196f4324fe6032e866d0f3bd0301cd486f \
     --hash=sha256:fdf1c1dc5bafc32bc5d08b054f94d659422b05aba244d6be4ddc1c72d9aa70fb \
+	--hash=sha256:495c5c2d43bf6cebe0178eb3e88f9c4aa48d8934aa6e3cddb865c058da76756b \
     # via cryptography
 chardet==3.0.4 \
     --hash=sha256:84ab92ed1c4d4f16916e05906b6b75a6c0fb5db821cc65e70cbd64a3e2a5eaae \

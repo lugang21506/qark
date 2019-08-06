@@ -40,4 +40,4 @@ class Fernflower(ExternalDecompiler):
                                     command="java -jar {path_to_decompiler} -ren=1 {jar} {build_directory}/fernflower")
 
 
-DECOMPILERS = (CFR(), Procyon(), Fernflower())
+DECOMPILERS = (CFR(), Procyon())

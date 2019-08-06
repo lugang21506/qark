@@ -37,8 +37,8 @@ def escape_windows_path(path):
             path = path.encode('string-escape')
         except Exception:
             path = path.encode('unicode-escape')
-
-    return path
+    windowPath = path.decode()
+    return windowPath
 
 
 class Decompiler(object):
@@ -98,7 +98,7 @@ class Decompiler(object):
         decompiler_pool.join()
 
         jar_name = os.path.split(self.jar_path)[-1]
-        unpack_fernflower_jar(self.build_directory, jar_name)
+        # unpack_fernflower_jar(self.build_directory, jar_name)
 
     def _decompiler_function(self, decompiler):
         """
