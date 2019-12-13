@@ -26,6 +26,9 @@ setup(
             os.path.join("lib", "dex2jar-2.0", "*"),  # include dex2jar
             os.path.join("lib", "dex2jar-2.0", "lib", "*"),  # include dex2jar
             os.path.join("templates", "*.jinja"),  # include the reporting template files
+			os.path.join("lib", "jadx", "*"),  # include jadx root
+			os.path.join("lib", "jadx", "lib", "*.jar"),  # include jadx lib
+			os.path.join("lib", "jadx", "bin", "*"),  # include jadx lib
         ] + exploit_apk_files,  # include all the java files required for creating an exploit APK
     },
     install_requires=[
