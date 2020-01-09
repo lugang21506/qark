@@ -75,9 +75,15 @@ class Decompiler(object):
         self.source_code = False
         self.apk_name = os.path.splitext(os.path.basename(path_to_source))[0]  # name of APK without the .apk extension
 
-        self.dex_path = self._unpack_apk()
-        self.jar_path = self._run_dex2jar()
-        self.manifest_path = self.run_apktool()
+        if os.path.exists(self.build_directory):
+            try:
+                shutil.rmtree(self.build_directory,)
+            except Exception as e:
+                log.exception("rm %s failed", self.build_directory)
+
+        # self.dex_path = self._unpack_apk()
+        # self.jar_path = self._run_dex2jar()
+        # self.manifest_path = self.run_apktool()
 
         self.decompilers = DECOMPILERS
 
@@ -86,19 +92,43 @@ class Decompiler(object):
         if self.source_code:
             return
 
-        decompiler_pool = ThreadPool(len(self.decompilers))
+        self._run_jadx()
 
-        for decompiler in self.decompilers:
-            if not os.path.isdir(os.path.join(self.build_directory, decompiler.name)):
-                os.makedirs(os.path.join(self.build_directory, decompiler.name))
-            log.debug("Starting decompilation with %s", decompiler.name)
-            decompiler_pool.apply_async(self._decompiler_function, args=(decompiler,))
-
-        decompiler_pool.close()
-        decompiler_pool.join()
-
-        jar_name = os.path.split(self.jar_path)[-1]
+        # decompiler_pool = ThreadPool(len(self.decompilers))
+        #
+        # for decompiler in self.decompilers:
+        #     if not os.path.isdir(os.path.join(self.build_directory, decompiler.name)):
+        #         os.makedirs(os.path.join(self.build_directory, decompiler.name))
+        #     log.debug("Starting decompilation with %s", decompiler.name)
+        #     decompiler_pool.apply_async(self._decompiler_function, args=(decompiler,))
+        #
+        # decompiler_pool.close()
+        # decompiler_pool.join()
+        #
+        # jar_name = os.path.split(self.jar_path)[-1]
         # unpack_fernflower_jar(self.build_directory, jar_name)
+
+    def _run_jadx(self):
+        jadxBinPath = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib", "jadx", "bin")
+
+        if OS == "Windows":
+            jadxExec = os.path.join(jadxBinPath, "jadx.bat")
+        elif OS == "Linux":
+            jadxExec = os.path.join(jadxBinPath, "jadx")
+        else:
+            raise SystemExit("OS %s is not supported, please use Linux, Windows, or Mac OSX", OS)
+
+        cmd = jadxExec + " -d " + self.build_directory + " " + self.path_to_source
+        try:
+            process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                                       encoding='utf-8')
+            command_output = process.stdout.readlines()
+            ret = command_output
+        except Exception as e:
+            log.exception("%s failed to finish decompiling, e=[%s]", cmd, e)
+            log.exception(type(e))
+
+        self.manifest_path = os.path.join(self.path_to_source, "resources", "AndroidManifest.xml")
 
     def _decompiler_function(self, decompiler):
         """
@@ -179,6 +209,9 @@ class Decompiler(object):
         """
         log.debug("Unpacking apk")
         unzip_file(self.path_to_source, destination_to_unzip=self.build_directory)
+
+        files = os.listdir(self.build_directory)
+
 
         return os.path.join(self.build_directory, "classes.dex")
 
