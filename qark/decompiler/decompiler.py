@@ -126,9 +126,9 @@ class Decompiler(object):
             log.exception(type(e))
 
         shutil.move(os.path.join(self.build_directory, "resources", "AndroidManifest.xml"),
-                    os.path.join(self.build_directory, "sources", "AndroidManifest.xml"))
+                    os.path.join(self.build_directory, "AndroidManifest.xml"))
         shutil.rmtree(os.path.join(self.build_directory, "resources"), ignore_errors=True)
-        self.manifest_path = os.path.join(self.build_directory, "sources", "AndroidManifest.xml")
+        self.manifest_path = os.path.join(self.build_directory, "AndroidManifest.xml")
 
     def _decompiler_function(self, decompiler):
         """
