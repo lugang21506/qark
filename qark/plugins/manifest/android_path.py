@@ -17,7 +17,7 @@ class AndroidPath(ManifestPlugin):
         self.severity = Severity.WARNING
 
     def run(self):
-        with open(self.manifest_path, "r") as manifest_file:
+        with open(self.manifest_path, "r", encoding="utf-8") as manifest_file:
             for line_number, line in enumerate(manifest_file):
                 if "android:path=" in line:
                     self.issues.append(Issue(

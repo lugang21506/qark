@@ -20,7 +20,7 @@ class APIKeys(ManifestPlugin):
         self.severity = Severity.INFO
 
     def run(self):
-        with open(self.manifest_path, "r") as manifest_file:
+        with open(self.manifest_path, "r", encoding="utf-8") as manifest_file:
             for line_number, line in enumerate(manifest_file):
                 # TODO: Fix API_KEY_REGEX, there are too many false positives
                 # if re.search(API_KEY_REGEX, line) and not re.search(SPECIAL_CHARACTER_REGEX, line):

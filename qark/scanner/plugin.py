@@ -133,7 +133,7 @@ class FileContentsPlugin(FilePathPlugin):
             super(FileContentsPlugin, self).update(file_path)
 
             try:
-                with open(self.file_path, "r") as f:
+                with open(self.file_path, "r",encoding="utf-8") as f:
                     FileContentsPlugin.file_contents = f.read()
 
             except IOError:
@@ -187,6 +187,10 @@ class JavaASTPlugin(FileContentsPlugin):
                     log.debug("Unable to parse AST for file %s", self.file_path)
                     JavaASTPlugin.java_ast = None
                     JavaASTPlugin.parseable = False
+                    return
+                except Exception as e:
+                    log.debug(file_path + " check failed,Exception=[%s]", e)
+                    log.debug(type(e))
                     return
 
         if call_run and self.java_ast is not None:

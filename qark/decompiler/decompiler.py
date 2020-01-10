@@ -76,10 +76,7 @@ class Decompiler(object):
         self.apk_name = os.path.splitext(os.path.basename(path_to_source))[0]  # name of APK without the .apk extension
 
         if os.path.exists(self.build_directory):
-            try:
-                shutil.rmtree(self.build_directory,)
-            except Exception as e:
-                log.exception("rm %s failed", self.build_directory)
+            shutil.rmtree(self.build_directory, ignore_errors=True)
 
         # self.dex_path = self._unpack_apk()
         # self.jar_path = self._run_dex2jar()
@@ -128,7 +125,10 @@ class Decompiler(object):
             log.exception("%s failed to finish decompiling, e=[%s]", cmd, e)
             log.exception(type(e))
 
-        self.manifest_path = os.path.join(self.path_to_source, "resources", "AndroidManifest.xml")
+        shutil.move(os.path.join(self.build_directory, "resources", "AndroidManifest.xml"),
+                    os.path.join(self.build_directory, "sources", "AndroidManifest.xml"))
+        shutil.rmtree(os.path.join(self.build_directory, "resources"), ignore_errors=True)
+        self.manifest_path = os.path.join(self.build_directory, "sources", "AndroidManifest.xml")
 
     def _decompiler_function(self, decompiler):
         """

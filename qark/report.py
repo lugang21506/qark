@@ -62,7 +62,7 @@ class Report(object):
         open_flag = 'w'
         if self.keep_report:
             open_flag = 'a'
-        with open(full_report_path, mode=open_flag) as report_file:
+        with open(full_report_path, mode=open_flag, encoding="utf-8") as report_file:
             if not template_file:
                 template = jinja_env.get_template('{file_type}_report.jinja'.format(file_type=file_type))
             else:

@@ -320,7 +320,7 @@ class ExportedTags(ManifestPlugin):
                 continue
 
             try:
-                with open(java_file, "r") as java_file_to_read:
+                with open(java_file, "r", encoding="utf-8") as java_file_to_read:
                     file_contents = java_file_to_read.read()
             except IOError:
                 log.debug("Error reading file %s", java_file)

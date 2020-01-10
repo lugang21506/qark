@@ -74,14 +74,18 @@ class Scanner(object):
             current_file_subject.register(plugin)
 
         for filepath in self.files:
-            # This call will run all non-coroutine plugins, and also update the shared class variables
-            current_file_subject.notify(filepath)
+            try:
+                # This call will run all non-coroutine plugins, and also update the shared class variables
+                current_file_subject.notify(filepath)
 
-            # This will efficiently run all coroutine plugins
-            notify_coroutines(coroutine_plugins)
+                # This will efficiently run all coroutine plugins
+                notify_coroutines(coroutine_plugins)
 
-            # reset the plugin file data to None as we are done processing the file
-            current_file_subject.reset()
+                # reset the plugin file data to None as we are done processing the file
+                current_file_subject.reset()
+            except Exception as e:
+                log.debug(filepath + " check failed,Exception=[%s]", e)
+                log.debug(type(e))
 
         for plugin in plugins:
             self.issues.extend(plugin.issues)

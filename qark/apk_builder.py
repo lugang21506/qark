@@ -130,7 +130,7 @@ class APKBuilder(object):
         :param append: if the properties file should be appended to or not (if False, write over the file)
         """
         mode = "a" if append else "w"
-        with open(self.properties_file_path, mode) as properties_file:
+        with open(self.properties_file_path, mode, encoding="utf-8") as properties_file:
             for key, value in dict_to_write.items():
                 properties_file.write("{key}={value}\n".format(key=key, value=value))
 
@@ -142,7 +142,7 @@ class APKBuilder(object):
         :return: dictionary of values in key, value pairs
         :rtype: dict
         """
-        with open(self.properties_file_path, "r") as properties_file:
+        with open(self.properties_file_path, "r", encoding="utf-8") as properties_file:
             config = StringIO()
             config.write('[dummy_header]\n')
 
