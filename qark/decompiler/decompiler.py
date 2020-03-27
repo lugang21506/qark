@@ -115,14 +115,12 @@ class Decompiler(object):
         else:
             raise SystemExit("OS %s is not supported, please use Linux, Windows, or Mac OSX", OS)
 
-        cmd = jadxExec + " -d " + self.build_directory + " " + self.path_to_source
+        decompiler_command = escape_windows_path("{jadx_path} -d {build_directory} {path_to_source}".format(jadx_path=jadxExec, build_directory=self.build_directory,
+                                                                   path_to_source=self.path_to_source))
         try:
-            process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                                       encoding='utf-8')
-            command_output = process.stdout.readlines()
-            ret = command_output
+            ret = subprocess.call(shlex.split(decompiler_command))
         except Exception as e:
-            log.exception("%s failed to finish decompiling, e=[%s]", cmd, e)
+            log.exception("%s failed to finish decompiling, e=[%s]", decompiler_command, e)
             log.exception(type(e))
 
         shutil.move(os.path.join(self.build_directory, "resources", "AndroidManifest.xml"),
