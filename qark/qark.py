@@ -12,7 +12,10 @@ from qark.apk_builder import APKBuilder
 from qark.decompiler.decompiler import Decompiler
 from qark.report import Report
 from qark.scanner.scanner import Scanner
-from qark.utils import environ_path_variable_exists
+from qark.utils import environ_path_variable_exists, RsltPush, rdata
+
+import qark.utils
+import json
 
 DEBUG_LOG_PATH = os.path.join(os.getcwd(),
                               "qark_debug.log")
@@ -49,9 +52,11 @@ logger = logging.getLogger(__name__)
               help="report output path.", show_default=True)
 @click.option("--keep-report/--no-keep-report", default=False,
               help="Append to final report file.", show_default=True)
+@click.option("--task-id", default=None, type=(str),
+              help="push info to task id.", show_default=True)
 @click.version_option()
 @click.pass_context
-def cli(ctx, sdk_path, build_path, debug, source, report_type, exploit_apk, report_path, keep_report):
+def cli(ctx, sdk_path, build_path, debug, source, report_type, exploit_apk, report_path, keep_report, task_id):
     if not source:
         click.secho("Please pass a source for scanning through either --java or --apk")
         click.secho(ctx.get_help())
@@ -83,21 +88,39 @@ def cli(ctx, sdk_path, build_path, debug, source, report_type, exploit_apk, repo
 
     initialize_logging(level)
 
+    qark.utils.TASK_ID = task_id
+
+    process_percent = {"process_percent": 0}
+    rdata["ExecDesc"] = json.dumps(process_percent)
+    RsltPush(task_id, rdata)
+
     click.secho("Decompiling...")
     decompiler = Decompiler(path_to_source=source, build_directory=build_path)
     decompiler.run()
+
+    process_percent = {"process_percent": 10}
+    rdata["ExecDesc"] = json.dumps(process_percent)
+    RsltPush(task_id, rdata)
 
     click.secho("Running scans...")
     path_to_source = decompiler.path_to_source if decompiler.source_code else decompiler.build_directory
 
     scanner = Scanner(manifest_path=decompiler.manifest_path, path_to_source=path_to_source)
-    scanner.run()
+    try:
+        scanner.run()
+    except Exception as e:
+        click.secho("Scan apk failed, Exception=[%s]" % e)
+
     click.secho("Finish scans...")
 
     click.secho("Writing report...")
     report = Report(issues=set(scanner.issues), report_path=report_path, keep_report=keep_report)
     report_path = report.generate(file_type=report_type)
     click.secho("Finish writing report to {report_path} ...".format(report_path=report_path))
+
+    process_percent = {"process_percent": 50}
+    rdata["ExecDesc"] = json.dumps(process_percent)
+    RsltPush(task_id, rdata)
 
     if exploit_apk:
         click.secho("Building exploit APK...")

@@ -13,6 +13,11 @@ from qark.scanner.plugin import PluginObserver
 from qark.scanner.plugin import get_plugin_source, get_plugins
 from qark.utils import is_java_file
 
+from qark.utils import RsltPush, rdata
+
+import qark.utils
+import json
+
 log = logging.getLogger(__name__)
 
 PLUGIN_CATEGORIES = ("manifest", "broadcast", "file", "crypto", "intent", "cert", "webview", "generic")
@@ -61,6 +66,10 @@ class Scanner(object):
             for plugin_name in get_plugins(category):
                 plugins.append(plugin_source.load_plugin(plugin_name).plugin)
 
+        process_percent = {"process_percent": 20}
+        rdata["ExecDesc"] = json.dumps(process_percent)
+        RsltPush(qark.utils.TASK_ID, rdata)
+
         self._run_checks(plugins)
 
     def _run_checks(self, plugins):
@@ -73,7 +82,18 @@ class Scanner(object):
         for plugin in plugins:
             current_file_subject.register(plugin)
 
-        for filepath in self.files:
+        total_files = len(self.files)
+        for index, filepath in enumerate(self.files):
+
+            if index == int(total_files / 3):
+                process_percent = {"process_percent": 30}
+                rdata["ExecDesc"] = json.dumps(process_percent)
+                RsltPush(qark.utils.TASK_ID, rdata)
+            elif index == int(total_files * 2 / 3):
+                process_percent = {"process_percent": 40}
+                rdata["ExecDesc"] = json.dumps(process_percent)
+                RsltPush(qark.utils.TASK_ID, rdata)
+
             try:
                 # This call will run all non-coroutine plugins, and also update the shared class variables
                 current_file_subject.notify(filepath)
