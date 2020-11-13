@@ -54,7 +54,7 @@ def RsltPush(taskId, rdata, charset='utf-8', reqnum=2):
 
     DATA = json.JSONEncoder().encode(rdata).encode('utf-8')
     #  url = 'http://10.120.99.202:8090/api/v1/LockTest/LockRsltPush=' + taskId
-    url = 'http://127.0.0.1:9000/api/v1/LockTest/LockRsltPush?taskid=' + taskId
+    url = 'http://10.124.103.14/api/v1/LockTest/LockRsltPush?taskid=' + taskId
 
     req = urllib.request.Request(url, data=DATA, headers=httpHeaders, method='POST')
     info = None
