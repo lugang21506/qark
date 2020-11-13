@@ -37,7 +37,10 @@ def escape_windows_path(path):
             path = path.encode('string-escape')
         except Exception:
             path = path.encode('unicode-escape')
-    windowPath = path.decode()
+    if isinstance(path, bytes):
+        windowPath = path.decode()
+    else:
+        windowPath = path
     return windowPath
 
 
